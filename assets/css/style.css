@@ -1,0 +1,24 @@
+*{
+    box-sizing: border-box;
+}
+.card {
+    background-color: #EDEEF0;
+}
+.card img{
+    width: 150px;
+    padding: 1em 0;
+    margin: 0 auto;
+}
+.card-body{
+    background-color: #9DD5a2;
+}
+.card-body a.btn{
+    background-color: #C45253;
+}
+#resultsPanel{
+    margin: 0 1em;
+    border-radius: 35px;
+}
+#resultsPanel>.card-body{
+    border-radius: 35px;
+}
