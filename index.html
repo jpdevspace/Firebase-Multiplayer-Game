@@ -23,7 +23,7 @@
     <div class="d-flex align-items-center">
         <!-- Player 1 Panel -->
         <div id="playerOne">
-            <h2 class="text-center">Hi, Username!
+                <h2 class="text-center">Hi,<span class="playerOneName"></span>!
                 <br />
                 <span class="badge badge-secondary">Player 1</span>
             </h2>
@@ -31,10 +31,10 @@
                 <img class="card-img-top" src="./assets/imgs/r.png" alt="User choice">
                 <div class="card-body">
                     <h4 class="card-title text-center">Win:<span></span> Lose<span></span></h4>
-                    <div class="d-flex justify-content-around">
-                        <a href="#" class="btn btn-info">Rock</a>
-                        <a href="#" class="btn btn-info">Paper</a>
-                        <a href="#" class="btn btn-info">Scissors</a>
+                    <div id="p1ChoiceDiv" class="d-flex justify-content-around">
+                        <a href="#" class="btn btn-info" data-userChoice="rock">Rock</a>
+                        <a href="#" class="btn btn-info" data-userChoice="paper">Paper</a>
+                        <a href="#" class="btn btn-info" data-userChoice="scissors">Scissors</a>                  
                     </div>
                 </div>
             </div>    
@@ -47,7 +47,7 @@
         </div>
         <!-- Player 2 Panel -->
         <div id="playerTwo">
-            <h2 class="text-center">Hi, Username!
+            <h2 class="text-center">Hi,<span class="playerTwoName"></span>!
                 <br />
                 <span class="badge badge-secondary">Player 2</span>
             </h2>
@@ -55,10 +55,10 @@
                 <img class="card-img-top" src="./assets/imgs/s.png" alt="User choice">
                 <div class="card-body">
                     <h4 class="card-title text-center">Win:<span></span> Lose<span></span></h4>
-                    <div class="d-flex justify-content-around">
-                        <a href="#" class="btn btn-info">Rock</a>
-                        <a href="#" class="btn btn-info">Paper</a>
-                        <a href="#" class="btn btn-info">Scissors</a>
+                    <div id="p2ChoiceDiv" class="d-flex justify-content-around">
+                        <a href="#" class="btn btn-info" data-userChoice="rock">Rock</a>
+                        <a href="#" class="btn btn-info" data-userChoice="paper">Paper</a>
+                        <a href="#" class="btn btn-info" data-userChoice="scissors">Scissors</a>
                     </div>
                 </div>
             </div> 
@@ -82,7 +82,7 @@
                             <form class="modal-footer form-inline">
                                 <label for="name" class="sr-only">Name:</label>
                                 <input type="text" class="form-control" id="name" placeholder="Enter player's name">
-                                <button id="startGame" class="btn btn-info" type="button" data-dismiss="modal">Enter</button>
+                                <button id="lego" class="btn btn-info" type="button" data-dismiss="modal">Enter</button>
                             </form>
                         </div>
                         <br />
@@ -102,7 +102,7 @@
 <!-- Bootstrap v4 JS -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
 <!-- Firebase -->
-
+<script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
 <!-- Own JavaScript -->
 <script src="./assets/js/app.js"></script>
 </body>
