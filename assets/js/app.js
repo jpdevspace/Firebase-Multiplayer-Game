@@ -42,13 +42,17 @@ $(function() {
     // DOM caching
     const $lego = $('#lego');
     const $pName = $('#name');
+    const $p1Panel = $('#playerOne');
+    const $p2Panel = $('#playerTwo');
+    const $p1Badge = $p1Panel.find('.badge');
+    const $p2Badge = $p2Panel.find('.badge'); 
     const $p1NameSpan = $('.playerOneName');
     const $p2NameSpan = $('.playerTwoName');
     const $pOneNameSpan = $('span.playerOneName');
     const $p1choice = $('#p1ChoiceDiv');
     const $p2choice = $('#p2ChoiceDiv');
-    const $imgP1 = $('#playerOne').find('img');
-    const $imgP2 = $('#playerTwo').find('img');
+    const $imgP1 = $p1Panel.find('img');
+    const $imgP2 = $p2Panel.find('img');
     const $rPanel = $('#resultsPanel').find('h4');
     const $p1LoseCountSpan = $('#p1LoseCountSpan');
     const $p1WinCountSpan = $('#p1WinCountSpan');
@@ -203,10 +207,12 @@ $(function() {
             let pChoice = leTarget.attr('data-userChoice');    // Get player choice attr from the clicked button
             leTarget.closest('div.card').find('img').attr('src', `./assets/imgs/${pChoice}.png`); // Change the img to match the user's choice
             if (pturn == 'p1turn'){
-                p1Choice = pChoice;
-                p1Ref.update({ choice: p1Choice }); //Update the user choice
-                turn = 'p2turn';
-                turnRef.update({ whoseturn: turn });
+                p1Choice = pChoice; // store the the data-userChoice attr value in a variable
+                p1Ref.update({ choice: p1Choice }); //Update the database with the user choice
+                turn = 'p2turn';    // Change the turn and store the value in a variable
+                turnRef.update({ whoseturn: turn });    // Update the turn in the database
+                $p1Badge.toggleClass('yourturn');
+                $p2Badge.toggleClass('yourturn');
                 $p1choice.off('click'); // Removes the event listener 
             }
             else {
@@ -214,6 +220,8 @@ $(function() {
                 p2Ref.update({ choice: p2Choice }); //Update the user choice
                 turn = 'p1turn';
                 turnRef.update({ whoseturn: turn });
+                $p1Badge.toggleClass('yourturn');
+                $p2Badge.toggleClass('yourturn');
                 $p2choice.off('click');
             }
         }
