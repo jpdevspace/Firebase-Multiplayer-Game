@@ -50,11 +50,14 @@ $(function() {
     const $imgP1 = $('#playerOne').find('img');
     const $imgP2 = $('#playerTwo').find('img');
     const $rPanel = $('#resultsPanel').find('h4');
+    const $p1LoseCountSpan = $('#p1LoseCountSpan');
+    const $p1WinCountSpan = $('#p1WinCountSpan');
+    const $p2LoseCountSpan = $('#p2LoseCountSpan');
+    const $p2WinCountSpan = $('#p2WinCountSpan');
 
     // Functions
     const playerName = () => {
         
-
         connectedRef.on('value', (snap) => { // Check if someone connected/disconnected
             if(snap.val()){ // If someone connected
                 const justConnected = connectionsRef.push(true);
@@ -130,6 +133,7 @@ $(function() {
             let p2name = snap.val().p2.name;
             let p1hand = snap.val().p1.choice;
             let p2hand = snap.val().p2.choice;
+
             if( p1hand == 'rock' && p2hand == 'rock'){
                 resultsin = 'Tie';
                 $rPanel.html(resultsin);
