@@ -27,7 +27,8 @@ $(function() {
     const connectedRef = db.ref(".info/connected");// Firebase's default Ref to track connections (boolean)
 
     // Variables
-    let pNameVal = '';
+    let p2NameVal = '';
+    let p1NameVal = '';
     let p1Wins = 0;
     let p1Losses = 0;
     let p1Choice = '';
@@ -41,15 +42,18 @@ $(function() {
     // DOM caching
     const $lego = $('#lego');
     const $pName = $('#name');
+    const $p1NameSpan = $('.playerOneName');
+    const $p2NameSpan = $('.playerTwoName');
     const $pOneNameSpan = $('span.playerOneName');
     const $p1choice = $('#p1ChoiceDiv');
     const $p2choice = $('#p2ChoiceDiv');
     const $imgP1 = $('#playerOne').find('img');
-    const $imgP2 = $('#playerTwo').find('img');;
+    const $imgP2 = $('#playerTwo').find('img');
+    const $rPanel = $('#resultsPanel').find('h4');
 
     // Functions
     const playerName = () => {
-        pNameVal = $pName.val(); // Get the name of the user
+        
 
         connectedRef.on('value', (snap) => { // Check if someone connected/disconnected
             if(snap.val()){ // If someone connected
@@ -61,10 +65,13 @@ $(function() {
             console.log(`Number of players online ${snap.numChildren()}`); 
             activePnum = snap.numChildren();
             if(activePnum == 1) { // If you're the 1st player
+                p1NameVal = $pName.val(); // Get the name of the user
+                $p1NameSpan.html(` ${p1NameVal}`); // Greet current player
+
                 // Create the object
                 const p1 = {
                     choice: '',
-                    name: pNameVal,
+                    name: p1NameVal,
                 };
                 const t = { whoseturn: turn };
 
@@ -79,10 +86,13 @@ $(function() {
 
             }
             else if(activePnum == 2) {  // If you are the 2nd player
+                p2NameVal = $pName.val(); // Get the name of the user
+                $p2NameSpan.html(` ${p2NameVal}`); // Greet current player
+
                 // Create the object
                 const p2 = {
                     choice: '',
-                    name: pNameVal
+                    name: p2NameVal
                 };
                 const w = {
                     p1: p1Wins,
@@ -115,77 +125,72 @@ $(function() {
     });
 
     playersRef.on('value', (snap) => {   // When P2 makes a choice
-        if(turn == 'p2turn' && activePnum == 2) {
-            console.log(snap.val());
+        if(turn == 'p2turn' && activePnum == 2) {   // Only compute results when is player 2's turn and there are 2 people connected
             let p1name = snap.val().p1.name;
             let p2name = snap.val().p2.name;
             let p1hand = snap.val().p1.choice;
             let p2hand = snap.val().p2.choice;
             if( p1hand == 'rock' && p2hand == 'rock'){
                 resultsin = 'Tie';
-                console.log(resultsin);
+                $rPanel.html(resultsin);
             }
             else if( p1hand == 'rock' && p2hand == 'paper'){
-                resultsin = `Player 2: ${p2name} Won`;
+                resultsin = `Player 2:<br>${p2name}<br>Won`;
                 p1Losses++;
                 p2Wins++;
                 winsRef.update({ p1: p1Wins, p2: p2Wins});
-                losesRef.update({ p1: p1Losses, p2: p2Losses })
-                console.log(resultsin);
+                losesRef.update({ p1: p1Losses, p2: p2Losses });
+                $rPanel.html(resultsin);
             }
             else if( p1hand == 'rock' && p2hand == 'scissors'){
-                resultsin = `Player 1: ${p1name} Won`;
+                resultsin = `Player 1:<br>${p1name}<br>Won`;
                 p2Losses++;
                 p1Wins++;
                 winsRef.update({ p1: p1Wins, p2: p2Wins});
-                losesRef.update({ p1: p1Losses, p2: p2Losses })
-                console.log(resultsin);
+                losesRef.update({ p1: p1Losses, p2: p2Losses });
+                $rPanel.html(resultsin);
             }
             else if( p1hand == 'paper' && p2hand == 'paper'){
                 resultsin = 'Tie';
-                console.log(resultsin);
+                $rPanel.html(resultsin);
             }
             else if( p1hand == 'paper' && p2hand == 'rock'){
-                resultsin = `Player 1: ${p1name} Won`;
+                resultsin = `Player 1:<br>${p1name}<br>Won`;
                 p2Losses++;
                 p1Wins++;
                 winsRef.update({ p1: p1Wins, p2: p2Wins});
                 losesRef.update({ p1: p1Losses, p2: p2Losses })
-                console.log(resultsin);
+                $rPanel.html(resultsin);
             }
             else if( p1hand == 'paper' && p2hand == 'scissors'){
-                resultsin = `Player 2: ${p2name} Won`;
+                resultsin = `Player 2:<br>${p2name}<br>Won`;
                 p1Losses++;
                 p2Wins++;
                 winsRef.update({ p1: p1Wins, p2: p2Wins});
                 losesRef.update({ p1: p1Losses, p2: p2Losses })
-                console.log(resultsin);
+                $rPanel.html(resultsin);
             }
             else if( p1hand == 'scissors' && p2hand == 'scissors'){
                 resultsin = 'Tie';
-                console.log(resultsin);
+                $rPanel.html(resultsin);
             }
             else if( p1hand == 'scissors' && p2hand == 'rock'){
-                resultsin = `Player 2: ${p2name} Won`;
+                resultsin = `Player 2:<br>${p2name}<br>Won`;
                 p1Losses++;
                 p2Wins++;
                 winsRef.update({ p1: p1Wins, p2: p2Wins});
                 losesRef.update({ p1: p1Losses, p2: p2Losses })
-                console.log(resultsin);
+                $rPanel.html(resultsin);
             }
             else if( p1hand == 'scissors' && p2hand == 'paper'){
-                resultsin = `Player 1: ${p1name} Won`;
+                resultsin = `Player 1:<br>${p1name}<br>Won`;
                 p2Losses++;
                 p1Wins++;
                 winsRef.update({ p1: p1Wins, p2: p2Wins});
                 losesRef.update({ p1: p1Losses, p2: p2Losses })
-                console.log(resultsin);
+                $rPanel.html(resultsin);
             }
-
-        
         }
-        
-        
     });
 
     const getPchoice = (pturn) => {  // Save user choice to Firebase
@@ -209,10 +214,6 @@ $(function() {
             }
         }
     }
-
-
-
-
    // Event Binders
    $lego.on('click', playerName);
    
