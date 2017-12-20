@@ -16,8 +16,12 @@ $(function() {
     const db = firebase.database();
 
     // Firebase Reference collections
-    const p1Ref = db.ref().child('/p1'); // P1 folder
-    const p2Ref = db.ref().child('/p2'); // P2 folder
+    const playersRef = db.ref().child('/players'); // Reference entire players folder 
+    const p1Ref = playersRef.child('/p1'); // Reference entire P1 folder
+    const p2Ref = playersRef.child('/p2'); // Reference entire P2 folder
+    const p2ChoiceRef = p2Ref.child('choice'); // Reference to P2 choices
+    const winsRef = db.ref().child('/win');    // Reference both player losses
+    const losesRef = db.ref().child('/losses');    // Reference both player wins
     const turnRef = db.ref().child('/turn'); // to track the turns
     const connectionsRef = db.ref("/connections"); // Folder to store each connection
     const connectedRef = db.ref(".info/connected");// Firebase's default Ref to track connections (boolean)
@@ -32,6 +36,7 @@ $(function() {
     let p2Choice = '';
     let turn = '';
     let activePnum = 0;
+    let resultsin = '';
 
     // DOM caching
     const $lego = $('#lego');
@@ -60,10 +65,9 @@ $(function() {
                 const p1 = {
                     choice: '',
                     name: pNameVal,
-                    wins: p1Wins,
-                    losses: p1Losses,
                 };
                 const t = { whoseturn: turn };
+
                 // Sync object
                 p1Ref.set(p1);
                 turnRef.set(t);
@@ -74,16 +78,24 @@ $(function() {
                 turnRef.update({ whoseturn: turn }); // Update the turn in the db
 
             }
-            else if(activePnum == 2) {
+            else if(activePnum == 2) {  // If you are the 2nd player
                 // Create the object
                 const p2 = {
                     choice: '',
-                    name: pNameVal,
-                    wins: p2Wins,
-                    losses: p2Losses,
+                    name: pNameVal
                 };
+                const w = {
+                    p1: p1Wins,
+                    p2: p2Wins
+                }
+                const l = {
+                    p1: p1Losses,
+                    p2: p2Losses
+                }
                 // Sync object
-                p2Ref.set(p2);
+                p2Ref.set(p2); 
+                winsRef.set(w);
+                losesRef.set(l);
                 console.log('play now');
                 turn = 'p1turn';
                 turnRef.update({ whoseturn: turn });
@@ -91,7 +103,7 @@ $(function() {
         });
     }
 
-    turnRef.on('child_changed', (snap) => { // When the turn changes
+    turnRef.on('child_changed', (snap) => { // Listen for turn changes
         let pturn = snap.val();
         console.log(`It's ${pturn}`);
         if(pturn == 'p1turn' && activePnum == 2) {  // If it's p1 turn and there's 2 players online
@@ -102,10 +114,84 @@ $(function() {
         }
     });
 
+    playersRef.on('value', (snap) => {   // When P2 makes a choice
+        if(turn == 'p2turn' && activePnum == 2) {
+            console.log(snap.val());
+            let p1name = snap.val().p1.name;
+            let p2name = snap.val().p2.name;
+            let p1hand = snap.val().p1.choice;
+            let p2hand = snap.val().p2.choice;
+            if( p1hand == 'rock' && p2hand == 'rock'){
+                resultsin = 'Tie';
+                console.log(resultsin);
+            }
+            else if( p1hand == 'rock' && p2hand == 'paper'){
+                resultsin = `Player 2: ${p2name} Won`;
+                p1Losses++;
+                p2Wins++;
+                winsRef.update({ p1: p1Wins, p2: p2Wins});
+                losesRef.update({ p1: p1Losses, p2: p2Losses })
+                console.log(resultsin);
+            }
+            else if( p1hand == 'rock' && p2hand == 'scissors'){
+                resultsin = `Player 1: ${p1name} Won`;
+                p2Losses++;
+                p1Wins++;
+                winsRef.update({ p1: p1Wins, p2: p2Wins});
+                losesRef.update({ p1: p1Losses, p2: p2Losses })
+                console.log(resultsin);
+            }
+            else if( p1hand == 'paper' && p2hand == 'paper'){
+                resultsin = 'Tie';
+                console.log(resultsin);
+            }
+            else if( p1hand == 'paper' && p2hand == 'rock'){
+                resultsin = `Player 1: ${p1name} Won`;
+                p2Losses++;
+                p1Wins++;
+                winsRef.update({ p1: p1Wins, p2: p2Wins});
+                losesRef.update({ p1: p1Losses, p2: p2Losses })
+                console.log(resultsin);
+            }
+            else if( p1hand == 'paper' && p2hand == 'scissors'){
+                resultsin = `Player 2: ${p2name} Won`;
+                p1Losses++;
+                p2Wins++;
+                winsRef.update({ p1: p1Wins, p2: p2Wins});
+                losesRef.update({ p1: p1Losses, p2: p2Losses })
+                console.log(resultsin);
+            }
+            else if( p1hand == 'scissors' && p2hand == 'scissors'){
+                resultsin = 'Tie';
+                console.log(resultsin);
+            }
+            else if( p1hand == 'scissors' && p2hand == 'rock'){
+                resultsin = `Player 2: ${p2name} Won`;
+                p1Losses++;
+                p2Wins++;
+                winsRef.update({ p1: p1Wins, p2: p2Wins});
+                losesRef.update({ p1: p1Losses, p2: p2Losses })
+                console.log(resultsin);
+            }
+            else if( p1hand == 'scissors' && p2hand == 'paper'){
+                resultsin = `Player 1: ${p1name} Won`;
+                p2Losses++;
+                p1Wins++;
+                winsRef.update({ p1: p1Wins, p2: p2Wins});
+                losesRef.update({ p1: p1Losses, p2: p2Losses })
+                console.log(resultsin);
+            }
+
+        
+        }
+        
+        
+    });
+
     const getPchoice = (pturn) => {  // Save user choice to Firebase
         return e => {
             let leTarget = $(e.target);
-            let pChoice = leTarget.attr('data-userChoice');    // Get player choice
+            let pChoice = leTarget.attr('data-userChoice');    // Get player choice attr from the clicked button
             leTarget.closest('div.card').find('img').attr('src', `./assets/imgs/${pChoice}.png`); // Change the img to match the user's choice
             if (pturn == 'p1turn'){
                 p1Choice = pChoice;
@@ -114,17 +200,17 @@ $(function() {
                 turnRef.update({ whoseturn: turn });
                 $p1choice.off('click'); // Removes the event listener 
             }
-            else if(pturn == 'p2turn') {
+            else {
                 p2Choice = pChoice;
                 p2Ref.update({ choice: p2Choice }); //Update the user choice
                 turn = 'p1turn';
                 turnRef.update({ whoseturn: turn });
                 $p2choice.off('click');
             }
-            
         }
-
     }
+
+
 
 
    // Event Binders
