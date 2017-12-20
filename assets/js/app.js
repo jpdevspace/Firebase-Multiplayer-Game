@@ -30,7 +30,8 @@ $(function() {
     let p2Wins = 0;
     let p2Losses = 0;
     let p2Choice = '';
-    let turn = 'p1turn';
+    let turn = '';
+    let activePnum = 0;
 
     // DOM caching
     const $lego = $('#lego');
@@ -52,9 +53,9 @@ $(function() {
             }
         });
         connectionsRef.on('value', (snap) => { // If I just moved someone to my connection folder
-            console.log(snap.numChildren()); 
-            const activeP = snap.numChildren();
-            if(activeP == 1) { // If you're the 1st player
+            console.log(`Number of players online ${snap.numChildren()}`); 
+            activePnum = snap.numChildren();
+            if(activePnum == 1) { // If you're the 1st player
                 // Create the object
                 const p1 = {
                     choice: '',
@@ -73,7 +74,7 @@ $(function() {
                 turnRef.update({ whoseturn: turn }); // Update the turn in the db
 
             }
-            else if(activeP == 2) {
+            else if(activePnum == 2) {
                 // Create the object
                 const p2 = {
                     choice: '',
@@ -90,18 +91,43 @@ $(function() {
         });
     }
 
-    const getP1Choice = e => {  // Save user choice to Firebase
-        if (turn == 'p2turn') {
-
+    turnRef.on('child_changed', (snap) => { // When the turn changes
+        let pturn = snap.val();
+        console.log(`It's ${pturn}`);
+        if(pturn == 'p1turn' && activePnum == 2) {  // If it's p1 turn and there's 2 players online
+            $p1choice.on('click', getPchoice(pturn)); // Listen for p1 click events on the choice btns
         }
-        let leTarget = $(e.target);
-        p1Choice = leTarget.attr('data-userChoice');    // Get p1 choice
-        $imgP1.attr('src', `./assets/imgs/${p1Choice}.png`); // Change the img to match the user's choice
-        p1Ref.update({ choice: p1Choice }); //Update the user choice
+        else if(pturn == 'p2turn' && activePnum == 2) { //If it's p1 turn and there's 2 players online
+            $p2choice.on('click', getPchoice(pturn)); // Liste for p2 click events
+        }
+    });
+
+    const getPchoice = (pturn) => {  // Save user choice to Firebase
+        return e => {
+            let leTarget = $(e.target);
+            let pChoice = leTarget.attr('data-userChoice');    // Get player choice
+            leTarget.closest('div.card').find('img').attr('src', `./assets/imgs/${pChoice}.png`); // Change the img to match the user's choice
+            if (pturn == 'p1turn'){
+                p1Choice = pChoice;
+                p1Ref.update({ choice: p1Choice }); //Update the user choice
+                turn = 'p2turn';
+                turnRef.update({ whoseturn: turn });
+                $p1choice.off('click'); // Removes the event listener 
+            }
+            else if(pturn == 'p2turn') {
+                p2Choice = pChoice;
+                p2Ref.update({ choice: p2Choice }); //Update the user choice
+                turn = 'p1turn';
+                turnRef.update({ whoseturn: turn });
+                $p2choice.off('click');
+            }
+            
+        }
+
     }
 
 
    // Event Binders
    $lego.on('click', playerName);
-   $p1choice.on('click', getP1Choice);
+   
 });
