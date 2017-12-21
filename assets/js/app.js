@@ -16,14 +16,13 @@ $(function() {
     const db = firebase.database();
 
     // Firebase Reference collections
-    const playersRef = db.ref().child('/players'); // Reference entire players folder 
-    const p1Ref = playersRef.child('/p1'); // Reference entire P1 folder
-    const p2Ref = playersRef.child('/p2'); // Reference entire P2 folder
-    const p2ChoiceRef = p2Ref.child('choice'); // Reference to P2 choices
-    const winsRef = db.ref().child('/win');    // Reference both player losses
-    const losesRef = db.ref().child('/losses');    // Reference both player wins
-    const turnRef = db.ref().child('/turn'); // to track the turns
-    const connectionsRef = db.ref("/connections"); // Folder to store each connection
+    const playersRef = db.ref('players'); // Reference entire players folder 
+    const p1Ref = playersRef.child('p1'); // Reference entire P1 folder
+    const p2Ref = playersRef.child('p2'); // Reference entire P2 folder
+    const winsRef = db.ref('win');    // Reference both player losses
+    const losesRef = db.ref('losses');    // Reference both player wins
+    const turnRef = db.ref('turn'); // to track the turns
+    const connectionsRef = db.ref("connections"); // Folder to store each connection
     const connectedRef = db.ref(".info/connected");// Firebase's default Ref to track connections (boolean)
     const chatRef = db.ref('chat'); // Reference chat
 
@@ -65,20 +64,22 @@ $(function() {
 
     // Functions
     const playerName = () => {
-        
         connectedRef.on('value', (snap) => { // Check if someone connected/disconnected
             if(snap.val()){ // If someone connected
-                const justConnected = connectionsRef.push(true);
-                justConnected.onDisconnect().remove(); // Remove user from the connection list when they disconnect
+                connectionsRef.push(true);
+                connectionsRef.onDisconnect().remove(); // Remove user from the connection list when they disconnect
             }
         });
         connectionsRef.on('value', (snap) => { // If I just moved someone to my connection folder
             console.log(`Number of players online ${snap.numChildren()}`); 
-            activePnum = snap.numChildren();
+            activePnum = snap.numChildren();    // Get the number of connections at the moment
             pNameVal = $pName.val(); // Get the name of the user
             $pNameSpan.html(` ${pNameVal}`); // Greet current player
 
             if(activePnum == 1) { // If you're the 1st player
+                chatRef.set({}); // If there's only one user, clear the chat history in the db
+                $chatUl.empty(); // Clear the HTML
+                
                 p1NameVal = pNameVal;   // Store the current name into a new variable to keep track inside the app
                 // Create the object
                 const p1 = {
@@ -92,7 +93,9 @@ $(function() {
                 turnRef.set(t);
 
                 // Wait for player two
+                $rPanel.html('Waiting for player 2');
                 console.log('Waiting for player 2');
+
                 turn = 'p2turn';
                 turnRef.update({ whoseturn: turn }); // Update the turn in the db
 
@@ -116,6 +119,9 @@ $(function() {
                 p2Ref.set(p2); 
                 winsRef.set(w);
                 losesRef.set(l);
+
+                // Inform user
+                $rPanel.html('Play Now!');
                 console.log('play now');
                 turn = 'p1turn';
                 turnRef.update({ whoseturn: turn });
@@ -151,6 +157,8 @@ $(function() {
                 p2Wins++;
                 winsRef.update({ p1: p1Wins, p2: p2Wins});
                 losesRef.update({ p1: p1Losses, p2: p2Losses });
+                $p1LoseCountSpan.html(p1Losses);
+                $p2WinCountSpan.html(p2Wins);
                 $rPanel.html(resultsin);
             }
             else if( p1hand == 'rock' && p2hand == 'scissors'){
@@ -159,6 +167,8 @@ $(function() {
                 p1Wins++;
                 winsRef.update({ p1: p1Wins, p2: p2Wins});
                 losesRef.update({ p1: p1Losses, p2: p2Losses });
+                $p1WinCountSpan.html(p1Wins);
+                $p2LoseCountSpan.html(p2Losses);
                 $rPanel.html(resultsin);
             }
             else if( p1hand == 'paper' && p2hand == 'paper'){
@@ -169,16 +179,20 @@ $(function() {
                 resultsin = `Player 1:<br>${p1name}<br>Won`;
                 p2Losses++;
                 p1Wins++;
-                winsRef.update({ p1: p1Wins, p2: p2Wins});
-                losesRef.update({ p1: p1Losses, p2: p2Losses })
+                winsRef.update({ p1: p1Wins, p2: p2Wins });
+                losesRef.update({ p1: p1Losses, p2: p2Losses });
+                $p1WinCountSpan.html(p1Wins);
+                $p2LoseCountSpan.html(p2Losses);
                 $rPanel.html(resultsin);
             }
             else if( p1hand == 'paper' && p2hand == 'scissors'){
                 resultsin = `Player 2:<br>${p2name}<br>Won`;
                 p1Losses++;
                 p2Wins++;
-                winsRef.update({ p1: p1Wins, p2: p2Wins});
-                losesRef.update({ p1: p1Losses, p2: p2Losses })
+                winsRef.update({ p1: p1Wins, p2: p2Wins });
+                losesRef.update({ p1: p1Losses, p2: p2Losses });
+                $p1LoseCountSpan.html(p1Losses);
+                $p2WinCountSpan.html(p2Wins);
                 $rPanel.html(resultsin);
             }
             else if( p1hand == 'scissors' && p2hand == 'scissors'){
@@ -189,16 +203,20 @@ $(function() {
                 resultsin = `Player 2:<br>${p2name}<br>Won`;
                 p1Losses++;
                 p2Wins++;
-                winsRef.update({ p1: p1Wins, p2: p2Wins});
-                losesRef.update({ p1: p1Losses, p2: p2Losses })
+                winsRef.update({ p1: p1Wins, p2: p2Wins });
+                losesRef.update({ p1: p1Losses, p2: p2Losses });
+                $p1LoseCountSpan.html(p1Losses);
+                $p2WinCountSpan.html(p2Wins);
                 $rPanel.html(resultsin);
             }
             else if( p1hand == 'scissors' && p2hand == 'paper'){
                 resultsin = `Player 1:<br>${p1name}<br>Won`;
                 p2Losses++;
                 p1Wins++;
-                winsRef.update({ p1: p1Wins, p2: p2Wins});
-                losesRef.update({ p1: p1Losses, p2: p2Losses })
+                winsRef.update({ p1: p1Wins, p2: p2Wins });
+                losesRef.update({ p1: p1Losses, p2: p2Losses });
+                $p1WinCountSpan.html(p1Wins);
+                $p2LoseCountSpan.html(p2Losses);
                 $rPanel.html(resultsin);
             }
         }
