@@ -25,6 +25,7 @@ $(function() {
     const turnRef = db.ref().child('/turn'); // to track the turns
     const connectionsRef = db.ref("/connections"); // Folder to store each connection
     const connectedRef = db.ref(".info/connected");// Firebase's default Ref to track connections (boolean)
+    const chatRef = db.ref('chat'); // Reference chat
 
     // Variables
     let p2NameVal = '';
@@ -58,6 +59,9 @@ $(function() {
     const $p1WinCountSpan = $('#p1WinCountSpan');
     const $p2LoseCountSpan = $('#p2LoseCountSpan');
     const $p2WinCountSpan = $('#p2WinCountSpan');
+    const $chatBtn = $('#chatSend');
+    const $chatInput = $('#message');
+    const $chatUl = $('#chat').find('ul');
 
     // Functions
     const playerName = () => {
@@ -225,7 +229,24 @@ $(function() {
             }
         }
     }
-   // Event Binders
-   $lego.on('click', playerName);
+
+    const chat = () => {
+        let leMsg = $chatInput.val();   // Get the msg from the chat input
+        chatRef.push({  // Push the message
+            msg: leMsg
+        });
+        $chatInput.val(''); // Empty input
+    }
+
+    chatRef.on('child_added', (snap) => {   // Listen for changes in the chat Reference in the db
+        let msgStr = `<li class="list-group-item list-group-item-dark">${snap.val().msg}`;  // Create a string with the msg
+        $chatUl.prepend(msgStr);    // Prepend the msg so it's at the top
+    });
+
+    // Event Binders
+    $lego.on('click', playerName);
+    $chatBtn.on('click', chat);
+
+
    
 });
