@@ -1,5 +1,9 @@
 *{
     box-sizing: border-box;
+    outline: none;
+}
+.container {
+    margin-bottom: 25px;
 }
 .card {
     background-color: #EDEEF0;
@@ -29,8 +33,15 @@
     margin: 0 auto;
     width: 120px;
 }
-
 .yourturn{
     border: 4px solid #9dd5a2;
     color: #9dd5a2;
+}
+#chat{
+    margin-top: 1em;
+}
+#chat>p{
+    background-color: #c55252;
+    padding: 0.1em;
+    border-radius: 3px;
 }

@@ -48,7 +48,7 @@ $(function() {
     const $p2Badge = $p2Panel.find('.badge'); 
     const $p1NameSpan = $('.playerOneName');
     const $p2NameSpan = $('.playerTwoName');
-    const $pOneNameSpan = $('span.playerOneName');
+    const $pNameSpan = $('span.playerName');
     const $p1choice = $('#p1ChoiceDiv');
     const $p2choice = $('#p2ChoiceDiv');
     const $imgP1 = $p1Panel.find('img');
@@ -71,14 +71,15 @@ $(function() {
         connectionsRef.on('value', (snap) => { // If I just moved someone to my connection folder
             console.log(`Number of players online ${snap.numChildren()}`); 
             activePnum = snap.numChildren();
-            if(activePnum == 1) { // If you're the 1st player
-                p1NameVal = $pName.val(); // Get the name of the user
-                $p1NameSpan.html(` ${p1NameVal}`); // Greet current player
+            pNameVal = $pName.val(); // Get the name of the user
+            $pNameSpan.html(` ${pNameVal}`); // Greet current player
 
+            if(activePnum == 1) { // If you're the 1st player
+                p1NameVal = pNameVal;   // Store the current name into a new variable to keep track inside the app
                 // Create the object
                 const p1 = {
                     choice: '',
-                    name: p1NameVal,
+                    name: p1NameVal, 
                 };
                 const t = { whoseturn: turn };
 
@@ -93,9 +94,7 @@ $(function() {
 
             }
             else if(activePnum == 2) {  // If you are the 2nd player
-                p2NameVal = $pName.val(); // Get the name of the user
-                $p2NameSpan.html(` ${p2NameVal}`); // Greet current player
-
+                p2NameVal = pNameVal;   // Store the current name into a different variable to keep track
                 // Create the object
                 const p2 = {
                     choice: '',
