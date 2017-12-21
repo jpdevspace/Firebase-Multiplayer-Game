@@ -12,4 +12,3 @@ Technologies used for this project: Firebase, JavaScript, Bootstrap v4, HTML and
 ### INSTRUCTIONS
 Type in your name in the box to start. It's a two player game so you will have to wait until someone joins (or open a second browser window).
 From there is a regular Rock Paper Scissors game, with a chat. All built with Firebase.
-rying to create duplicate buttons.
